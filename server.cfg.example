@@ -1,0 +1,26 @@
+# DarkSide - exemplo mínimo de configuração RedM
+
+sv_hostname "DarkSide DEV"
+sets sv_projectName "DarkSide"
+sets sv_projectDesc "DarkSide supernatural multiplayer"
+
+set gamename rdr3
+
+# OneSync
+set onesync on
+
+# Banco
+set mysql_connection_string "mysql://USER:PASSWORD@127.0.0.1/darkside?charset=utf8mb4"
+
+# Dependências
+ensure oxmysql
+ensure ox_lib
+ensure rsg-core
+
+# DarkSide
+ensure ds_core
+ensure ds_clans
+ensure ds_powers
+
+# Adicione sua key da Cfx.re abaixo
+sv_licenseKey "CHANGE_ME"
