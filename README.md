@@ -17,11 +17,43 @@ DarkSide é um projeto de jogo sobrenatural multiplayer construído sobre RedM. 
 
 - RedM / FXServer
 - RSG-Core
+- RSG Inventory
+- RSG Appearance
+- RSG Menubase
 - ox_lib
 - oxmysql
 - MariaDB/MySQL
 - Lua
 - NUI (HTML/CSS/JavaScript) quando necessário
+
+## Instalação das dependências
+
+No Windows, depois de clonar o repositório, rode na raiz:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\install-dependencies.ps1
+```
+
+O instalador coloca automaticamente:
+
+```text
+resources/[standalone]/ox_lib
+resources/[standalone]/oxmysql
+resources/[rsg]/rsg-core
+resources/[rsg]/rsg-menubase
+resources/[rsg]/rsg-inventory
+resources/[rsg]/rsg-appearance
+```
+
+Validação:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\check-dependencies.ps1
+```
+
+> `ox_inventory` não é usado porque o resource oficial é declarado para `gta5`. No RedM, a base inicial usa `rsg-inventory`.
+
+Veja também `DEPENDENCIES.md`.
 
 ## Arquitetura
 
