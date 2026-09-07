@@ -12,15 +12,33 @@ set onesync on
 # Banco
 set mysql_connection_string "mysql://USER:PASSWORD@127.0.0.1/darkside?charset=utf8mb4"
 
-# Dependências
+# Dependências standalone
 ensure oxmysql
 ensure ox_lib
+
+# Base RSG mínima
 ensure rsg-core
+ensure rsg-menubase
+ensure rsg-inventory
+ensure rsg-appearance
 
 # DarkSide
 ensure ds_core
 ensure ds_clans
 ensure ds_powers
+
+# Futuras camadas do jogo, conforme forem implementadas:
+# ensure ds_inventory
+# ensure ds_progression
+# ensure ds_zones
+# ensure ds_ai
+# ensure ds_killers
+# ensure ds_entities
+# ensure ds_director
+# ensure ds_events
+# ensure ds_hud
+# ensure ds_audio
+# ensure ds_admin
 
 # Adicione sua key da Cfx.re abaixo
 sv_licenseKey "CHANGE_ME"
