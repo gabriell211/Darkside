@@ -1,0 +1,80 @@
+name: Vendor RedM dependencies
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - dependencies.trigger
+
+permissions:
+  contents: write
+
+jobs:
+  vendor:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout DarkSide
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install runtime dependencies
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          STANDALONE='resources/[standalone]'
+          RSG='resources/[rsg]'
+          TMP="$(mktemp -d)"
+
+          mkdir -p "$STANDALONE" "$RSG"
+
+          rm -rf "$STANDALONE/ox_lib" "$STANDALONE/oxmysql"
+          rm -rf "$RSG/rsg-core" "$RSG/rsg-menubase" "$RSG/rsg-inventory" "$RSG/rsg-appearance"
+
+          echo 'Downloading ox_lib v3.39.0 runtime release...'
+          curl -fsSL 'https://github.com/overextended/ox_lib/releases/download/v3.39.0/ox_lib.zip' -o "$TMP/ox_lib.zip"
+          mkdir -p "$TMP/ox_lib"
+          unzip -q "$TMP/ox_lib.zip" -d "$TMP/ox_lib"
+          if [ -d "$TMP/ox_lib/ox_lib" ]; then
+            mv "$TMP/ox_lib/ox_lib" "$STANDALONE/ox_lib"
+          else
+            mkdir -p "$STANDALONE/ox_lib"
+            cp -a "$TMP/ox_lib/." "$STANDALONE/ox_lib/"
+          fi
+
+          echo 'Downloading oxmysql v2.14.1 runtime release...'
+          curl -fsSL 'https://github.com/overextended/oxmysql/releases/download/v2.14.1/oxmysql.zip' -o "$TMP/oxmysql.zip"
+          mkdir -p "$TMP/oxmysql"
+          unzip -q "$TMP/oxmysql.zip" -d "$TMP/oxmysql"
+          if [ -d "$TMP/oxmysql/oxmysql" ]; then
+            mv "$TMP/oxmysql/oxmysql" "$STANDALONE/oxmysql"
+          else
+            mkdir -p "$STANDALONE/oxmysql"
+            cp -a "$TMP/oxmysql/." "$STANDALONE/oxmysql/"
+          fi
+
+          echo 'Cloning RSG resources...'
+          git clone --depth 1 https://github.com/Rexshack-RedM/rsg-core.git "$RSG/rsg-core"
+          git clone --depth 1 https://github.com/Rexshack-RedM/rsg-menubase.git "$RSG/rsg-menubase"
+          git clone --depth 1 https://github.com/Rexshack-RedM/rsg-inventory.git "$RSG/rsg-inventory"
+          git clone --depth 1 https://github.com/Rexshack-RedM/rsg-appearance.git "$RSG/rsg-appearance"
+
+          rm -rf "$RSG/rsg-core/.git" "$RSG/rsg-menubase/.git" "$RSG/rsg-inventory/.git" "$RSG/rsg-appearance/.git"
+          rm -rf "$TMP"
+
+      - name: Commit vendored dependencies
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'darkside-dependency-bot'
+          git config user.email 'darkside-dependency-bot@users.noreply.github.com'
+          git add 'resources/[standalone]' 'resources/[rsg]'
+
+          if git diff --cached --quiet; then
+            echo 'Dependencies already up to date.'
+            exit 0
+          fi
+
+          git commit -m 'build: vendor RedM runtime dependencies'
+          git push origin HEAD:main
