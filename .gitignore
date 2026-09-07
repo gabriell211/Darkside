@@ -1,0 +1,23 @@
+# Local FXServer configuration
+server.cfg
+
+# FXServer/runtime generated data
+cache/
+crashes/
+logs/
+*.log
+
+# Local editor / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Local secrets / env
+.env
+.env.*
+!.env.example
+
+# Temporary files
+*.tmp
+*.bak
