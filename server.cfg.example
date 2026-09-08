@@ -18,6 +18,7 @@ setr voice_useNativeAudio true
 setr voice_useSendingRangeOnly true
 setr voice_enableUi 1
 setr voice_enableProximityCycle 1
+setr voice_defaultCycle "HOME"
 setr voice_defaultVoiceMode 2
 setr voice_enableSubmix 1
 
