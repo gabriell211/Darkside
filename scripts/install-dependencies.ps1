@@ -40,6 +40,16 @@ function Prepare-Target {
     return $true
 }
 
+function Write-Utf8NoBom {
+    param(
+        [Parameter(Mandatory = $true)][string]$Path,
+        [Parameter(Mandatory = $true)][string]$Content
+    )
+
+    $encoding = New-Object System.Text.UTF8Encoding($false)
+    [System.IO.File]::WriteAllText($Path, $Content, $encoding)
+}
+
 function Install-ReleaseZip {
     param(
         [Parameter(Mandatory = $true)][string]$Name,
@@ -79,7 +89,7 @@ function Install-GitDependency {
         [string]$Commit = ''
     )
 
-    if (-not (Prepare-Target -Path $Target)) { return }
+    if (-not (Prepare-Target -Path $Target)) { return $false }
 
     Write-Host "[CLONE] $Name" -ForegroundColor Cyan
 
@@ -115,6 +125,40 @@ function Install-GitDependency {
     }
 
     Write-Host "[OK] $Name -> $Target" -ForegroundColor Green
+    return $true
+}
+
+function Apply-DarkSidePmaPatch {
+    param([Parameter(Mandatory = $true)][string]$PmaDir)
+
+    $sharedPath = Join-Path $PmaDir 'shared.lua'
+    $mainPath = Join-Path $PmaDir 'client\init\main.lua'
+
+    if (-not (Test-Path -LiteralPath $sharedPath)) {
+        throw "pma-voice shared.lua nao encontrado em $sharedPath"
+    }
+    if (-not (Test-Path -LiteralPath $mainPath)) {
+        throw "pma-voice client/init/main.lua nao encontrado em $mainPath"
+    }
+
+    # Mantém a sensação de proximidade da BaseReborn: 1 / 5 / 10.
+    # O patch é aplicado sobre um commit fixado do upstream oficial com suporte a RedM.
+    $shared = [System.IO.File]::ReadAllText($sharedPath)
+    $shared = [regex]::Replace($shared, '\{\s*1\.5,\s*"Whisper"\s*\}', '{ 1.0, "Baixo" }')
+    $shared = [regex]::Replace($shared, '\{\s*3\.0,\s*"Normal"\s*\}', '{ 5.0, "Medio" }')
+    $shared = [regex]::Replace($shared, '\{\s*6\.0,\s*"Shouting"\s*\}', '{ 10.0, "Alto" }')
+    $shared = [regex]::Replace($shared, '\{\s*3\.0,\s*"Whisper"\s*\}', '{ 1.0, "Baixo" }')
+    $shared = [regex]::Replace($shared, '\{\s*7\.0,\s*"Normal"\s*\}', '{ 5.0, "Medio" }')
+    $shared = [regex]::Replace($shared, '\{\s*15\.0,\s*"Shouting"\s*\}', '{ 10.0, "Alto" }')
+    Write-Utf8NoBom -Path $sharedPath -Content $shared
+
+    # O PMA atual usa F11 fixo no caminho RedM. A BaseReborn usa HOME para alternar alcance.
+    $main = [System.IO.File]::ReadAllText($mainPath)
+    $main = $main.Replace('local KEY_F11 = 0x7A', 'local KEY_HOME = 0x24')
+    $main = $main.Replace('end, KEY_F11, true)', 'end, KEY_HOME, true)')
+    Write-Utf8NoBom -Path $mainPath -Content $main
+
+    Write-Host '[PATCH] pma-voice -> RedM + perfil DarkSide/BaseReborn (HOME, 1/5/10)' -ForegroundColor Magenta
 }
 
 try {
@@ -130,11 +174,17 @@ try {
         -Target (Join-Path $StandaloneDir 'oxmysql')
 
     # Voz. A BaseReborn inclui uma copia antiga do pma-voice com manifest gta5.
-    # Para DarkSide usamos o upstream atual, da mesma familia PMA, pois este possui suporte explicito a RedM.
-    Install-GitDependency -Name 'pma-voice' `
+    # Para DarkSide usamos o upstream oficial atual (mesma familia PMA), com suporte explicito a RedM,
+    # e aplicamos apenas o perfil de proximidade/tecla que queremos preservar da BaseReborn.
+    $pmaTarget = Join-Path $VoiceDir 'pma-voice'
+    $pmaInstalled = Install-GitDependency -Name 'pma-voice' `
         -Repository 'https://github.com/AvarianKnight/pma-voice.git' `
-        -Target (Join-Path $VoiceDir 'pma-voice') `
+        -Target $pmaTarget `
         -Commit '6c9d96ed7a02e30912f1a0ce92629bf9afbbca8c'
+
+    if ($pmaInstalled) {
+        Apply-DarkSidePmaPatch -PmaDir $pmaTarget
+    }
 
     # Base RedM/RSG.
     Install-GitDependency -Name 'rsg-core' `
