@@ -28,6 +28,7 @@ ensure ds_clans
 ensure ds_powers
 ensure ds_ai
 ensure ds_killers
+ensure ds_horror
 
 # Futuras camadas do jogo, conforme forem implementadas:
 # ensure ds_inventory
