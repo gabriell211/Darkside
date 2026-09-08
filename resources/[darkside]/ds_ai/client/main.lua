@@ -98,11 +98,12 @@ local function findNearestAudiblePlayer(ped, profile)
             local distance = #(targetCoords - pedCoords)
             local currentStimulus = nil
             local range = profile.hearingRange
+            local movementSpeed = GetEntitySpeed(targetPed)
 
             if IsPedShooting(targetPed) then
                 currentStimulus = 'GUNSHOT'
                 range = profile.gunshotRange
-            elseif IsPedSprinting(targetPed) or IsPedRunning(targetPed) then
+            elseif movementSpeed >= 2.5 then
                 currentStimulus = 'RUNNING'
                 range = profile.runningRange
             elseif distance <= profile.hearingRange then
