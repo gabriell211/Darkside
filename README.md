@@ -20,6 +20,7 @@ DarkSide é um projeto de jogo sobrenatural multiplayer construído sobre RedM. 
 - RSG Inventory
 - RSG Appearance
 - RSG Menubase
+- pma-voice / Mumble
 - ox_lib
 - oxmysql
 - MariaDB/MySQL
@@ -39,6 +40,7 @@ O instalador coloca automaticamente:
 ```text
 resources/[standalone]/ox_lib
 resources/[standalone]/oxmysql
+resources/[voice]/pma-voice
 resources/[rsg]/rsg-core
 resources/[rsg]/rsg-menubase
 resources/[rsg]/rsg-inventory
@@ -53,17 +55,21 @@ powershell -ExecutionPolicy Bypass -File .\scripts\check-dependencies.ps1
 
 > `ox_inventory` não é usado porque o resource oficial é declarado para `gta5`. No RedM, a base inicial usa `rsg-inventory`.
 
-Veja também `DEPENDENCIES.md`.
+> A BaseReborn foi usada como referência para PMA, mas a cópia incluída nela declara `game "gta5"`. O instalador usa o upstream atual `AvarianKnight/pma-voice`, que possui suporte explícito a RedM.
+
+Veja também `DEPENDENCIES.md` e `docs/VOICE.md`.
 
 ## Arquitetura
 
 ```text
 RedM
+├── pma-voice
 └── RSG-Core
     └── DarkSide Framework
         ├── ds_core
         ├── ds_clans
         ├── ds_powers
+        ├── ds_voice
         ├── ds_inventory
         ├── ds_progression
         ├── ds_zones
@@ -78,18 +84,35 @@ RedM
         └── ds_admin
 ```
 
-O RSG-Core é infraestrutura. As regras de gameplay pertencem aos resources `ds_*`.
+O RSG-Core é infraestrutura. As regras de gameplay pertencem aos resources `ds_*`. O `ds_voice` serve como adapter entre o PMA e os sistemas DarkSide.
 
 ## Recursos já implementados
 
 - `ds_core`: integração base com RSG-Core e persistência DarkSide.
 - `ds_clans`: estrutura inicial de clãs jogáveis.
 - `ds_powers`: energia, cooldown e poderes iniciais.
+- `ds_voice`: adapter do pma-voice, leitura de modo/distância e estado de fala para HUD, IA e sistemas de terror.
 - `ds_ai`: controlador reutilizável de NPCs com visão, audição e estados `IDLE`, `INVESTIGATE`, `CHASE`, `ATTACK` e `SEARCH`.
 - `ds_killers`: spawn networked, registry server-side, comandos administrativos e persistência de encontros.
 - `ds_horror`: zonas de horror, intensidade progressiva, efeitos nativos de atmosfera, modo de teste e telemetria SQL.
 
 O primeiro killer técnico é `hunter` / **The Hunter**. O modelo atual é temporário; serve para validar IA e networking.
+
+## Voz
+
+O `server.cfg.example` inicia `pma-voice` com áudio nativo e `voice_useSendingRangeOnly` habilitados. Telefone, rádio e animação de rádio começam desligados até existir gameplay para eles.
+
+A tecla padrão de troca de proximidade é `HOME`, seguindo a referência usada na BaseReborn.
+
+A camada `ds_voice` expõe:
+
+```lua
+exports['ds_voice']:GetState()
+exports['ds_voice']:GetMode()
+exports['ds_voice']:IsTalking()
+```
+
+Veja `docs/VOICE.md`.
 
 ## Banco de dados
 
@@ -114,6 +137,8 @@ ds_killer_encounters
 ds_horror_events
 ds_horror_zone_state
 ```
+
+A voz em tempo real não necessita de tabela SQL nesta fase.
 
 ## Teste do killer
 
@@ -184,6 +209,6 @@ A primeira versão jogável deve provar o conceito inteiro com o menor escopo po
 
 **Fase 0 — Fundação técnica / Vertical Slice.**
 
-A fundação, clãs, poderes, primeiro killer, percepção por som e primeira camada de horror já estão no repositório. Próximas prioridades: áudio 3D próprio, entidades/aparições, zonas permanentes, Horror Director e progressão.
+A fundação, clãs, poderes, voz PMA/RedM, primeiro killer, percepção por som e primeira camada de horror já estão no repositório. Próximas prioridades: áudio 3D próprio, entidades/aparições, zonas permanentes, Horror Director e progressão.
 
-Consulte `docs/GDD.md`, `docs/ARCHITECTURE.md`, `docs/ROADMAP.md`, `docs/KILLERS.md` e `docs/HORROR_RESEARCH.md`.
+Consulte `docs/GDD.md`, `docs/ARCHITECTURE.md`, `docs/ROADMAP.md`, `docs/KILLERS.md`, `docs/HORROR_RESEARCH.md` e `docs/VOICE.md`.
