@@ -82,17 +82,29 @@ function Install-GitDependency {
     if (-not (Prepare-Target -Path $Target)) { return }
 
     Write-Host "[CLONE] $Name" -ForegroundColor Cyan
-    git clone --depth 1 --branch $Branch $Repository $Target
-
-    if ($LASTEXITCODE -ne 0) {
-        throw "Falha ao clonar $Name."
-    }
 
     if ($Commit) {
-        Write-Host "[PIN] $Name -> $Commit" -ForegroundColor DarkCyan
-        git -C $Target checkout --detach $Commit
+        # Busca apenas o commit fixado. Assim o instalador continua reproduzível mesmo
+        # quando o branch main avançar e o commit não estiver no depth=1 atual.
+        New-Item -ItemType Directory -Force -Path $Target | Out-Null
+        git -C $Target init --quiet
+        git -C $Target remote add origin $Repository
+        git -C $Target fetch --depth 1 origin $Commit
+        if ($LASTEXITCODE -ne 0) {
+            throw "Falha ao buscar o commit fixado de $Name ($Commit)."
+        }
+
+        git -C $Target checkout --detach FETCH_HEAD
         if ($LASTEXITCODE -ne 0) {
             throw "Falha ao fixar $Name no commit $Commit."
+        }
+
+        Write-Host "[PIN] $Name -> $Commit" -ForegroundColor DarkCyan
+    }
+    else {
+        git clone --depth 1 --branch $Branch $Repository $Target
+        if ($LASTEXITCODE -ne 0) {
+            throw "Falha ao clonar $Name."
         }
     }
 
