@@ -26,19 +26,23 @@ ensure rsg-appearance
 ensure ds_core
 ensure ds_clans
 ensure ds_powers
+ensure ds_ai
+ensure ds_killers
 
 # Futuras camadas do jogo, conforme forem implementadas:
 # ensure ds_inventory
 # ensure ds_progression
 # ensure ds_zones
-# ensure ds_ai
-# ensure ds_killers
 # ensure ds_entities
 # ensure ds_director
 # ensure ds_events
 # ensure ds_hud
 # ensure ds_audio
 # ensure ds_admin
+
+# Permissão para comandos de desenvolvimento DarkSide.
+# Associe seu identificador a um grupo/admin conforme sua base e mantenha esta ACE.
+add_ace group.admin darkside.admin allow
 
 # Adicione sua key da Cfx.re abaixo
 sv_licenseKey "CHANGE_ME"
