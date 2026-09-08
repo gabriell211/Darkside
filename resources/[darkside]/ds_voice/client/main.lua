@@ -20,7 +20,7 @@ local function refreshProximity()
 
     local changed = false
 
-    local mode = tonumber(proximity.index or proximity.mode)
+    local mode = tonumber(proximity.index)
     if mode and mode ~= voiceState.mode then
         voiceState.mode = mode
         changed = true
@@ -33,6 +33,10 @@ local function refreshProximity()
     end
 
     local name = proximity.name or proximity.modeName
+    if not name and type(proximity.mode) == 'string' then
+        name = proximity.mode
+    end
+
     if name and name ~= voiceState.name then
         voiceState.name = name
         changed = true
