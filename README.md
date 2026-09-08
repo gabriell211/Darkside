@@ -79,6 +79,56 @@ RedM
 
 O RSG-Core é infraestrutura. As regras de gameplay pertencem aos resources `ds_*`.
 
+## Recursos já implementados
+
+- `ds_core`: integração base com RSG-Core e persistência DarkSide.
+- `ds_clans`: estrutura inicial de clãs jogáveis.
+- `ds_powers`: energia, cooldown e poderes iniciais.
+- `ds_ai`: controlador reutilizável de NPCs com `IDLE`, `CHASE`, `ATTACK` e `SEARCH`.
+- `ds_killers`: spawn networked, registry server-side, comandos administrativos e persistência de encontros.
+
+O primeiro killer técnico é `hunter` / **The Hunter**. O modelo atual é temporário; serve para validar IA e networking.
+
+## Banco de dados
+
+Instalação nova:
+
+```text
+database/schema.sql
+```
+
+Se você já importou o schema antes da implementação dos killers, rode também:
+
+```text
+database/migrations/002_killers.sql
+```
+
+As tabelas novas são:
+
+```text
+ds_killer_instances
+ds_killer_encounters
+```
+
+## Teste do killer
+
+Com a ACE `darkside.admin` configurada:
+
+```text
+/dskiller spawn hunter
+/dskiller list
+/dskiller delete <instance_id>
+/dskiller clear
+```
+
+Pelo console:
+
+```text
+dskiller spawn hunter <playerId>
+```
+
+Veja `docs/KILLERS.md` para funcionamento, segurança e limitações do protótipo.
+
 ## Primeira meta: Vertical Slice
 
 A primeira versão jogável deve provar o conceito inteiro com o menor escopo possível:
@@ -107,6 +157,8 @@ A primeira versão jogável deve provar o conceito inteiro com o menor escopo po
 
 ## Status
 
-**Fase 0 — Fundação técnica.**
+**Fase 0 — Fundação técnica / Vertical Slice.**
 
-A estrutura inicial do projeto está sendo criada agora. Consulte `docs/GDD.md`, `docs/ARCHITECTURE.md` e `docs/ROADMAP.md`.
+A fundação, clãs, poderes e primeiro killer com IA já estão no repositório. Próximas prioridades: `ds_zones`, percepção por som, criaturas, entidades e Horror Director.
+
+Consulte `docs/GDD.md`, `docs/ARCHITECTURE.md`, `docs/ROADMAP.md` e `docs/KILLERS.md`.
