@@ -83,11 +83,50 @@ local function findNearestVisiblePlayer(ped, detectionRange)
     return nearestPlayer, nearestPed, nearestDistance
 end
 
+local function findNearestAudiblePlayer(ped, profile)
+    local pedCoords = GetEntityCoords(ped)
+    local nearestPlayer = nil
+    local nearestPed = nil
+    local nearestDistance = math.huge
+    local stimulus = nil
+
+    for _, player in ipairs(GetActivePlayers()) do
+        local targetPed = GetPlayerPed(player)
+
+        if targetPed ~= ped and DoesEntityExist(targetPed) and not IsEntityDead(targetPed) then
+            local targetCoords = GetEntityCoords(targetPed)
+            local distance = #(targetCoords - pedCoords)
+            local currentStimulus = nil
+            local range = profile.hearingRange
+
+            if IsPedShooting(targetPed) then
+                currentStimulus = 'GUNSHOT'
+                range = profile.gunshotRange
+            elseif IsPedSprinting(targetPed) or IsPedRunning(targetPed) then
+                currentStimulus = 'RUNNING'
+                range = profile.runningRange
+            elseif distance <= profile.hearingRange then
+                currentStimulus = 'PRESENCE'
+            end
+
+            if currentStimulus and distance <= range and distance < nearestDistance then
+                nearestPlayer = player
+                nearestPed = targetPed
+                nearestDistance = distance
+                stimulus = currentStimulus
+            end
+        end
+    end
+
+    return nearestPlayer, nearestPed, nearestDistance, stimulus
+end
+
 local function beginCombat(controller, ped, targetPlayer, targetPed, distance)
     controller.targetPlayer = targetPlayer
     controller.targetPed = targetPed
     controller.lastKnownCoords = GetEntityCoords(targetPed)
     controller.lastSeenAt = GetGameTimer()
+    controller.lastStimulusAt = GetGameTimer()
 
     requestControl(ped)
     TaskCombatPed(ped, targetPed, 0, 16)
@@ -97,6 +136,31 @@ local function beginCombat(controller, ped, targetPlayer, targetPed, distance)
     else
         setState(controller, 'CHASE', targetPlayer)
     end
+end
+
+local function beginInvestigate(controller, ped, targetPlayer, targetPed, stimulus)
+    controller.targetPlayer = nil
+    controller.targetPed = nil
+    controller.lastKnownCoords = GetEntityCoords(targetPed)
+    controller.lastStimulusAt = GetGameTimer()
+    controller.lastStimulus = stimulus
+
+    requestControl(ped)
+    ClearPedTasks(ped)
+
+    local coords = controller.lastKnownCoords
+    TaskGoStraightToCoord(
+        ped,
+        coords.x,
+        coords.y,
+        coords.z,
+        controller.profile.investigateSpeed,
+        -1,
+        0.0,
+        0.0
+    )
+
+    setState(controller, 'INVESTIGATE', targetPlayer)
 end
 
 local function beginSearch(controller, ped)
@@ -112,6 +176,27 @@ local function beginSearch(controller, ped)
     end
 
     setState(controller, 'SEARCH')
+end
+
+local function refreshInvestigation(controller, ped, targetPed, stimulus)
+    controller.lastKnownCoords = GetEntityCoords(targetPed)
+    controller.lastStimulusAt = GetGameTimer()
+    controller.lastStimulus = stimulus
+
+    requestControl(ped)
+    ClearPedTasks(ped)
+
+    local coords = controller.lastKnownCoords
+    TaskGoStraightToCoord(
+        ped,
+        coords.x,
+        coords.y,
+        coords.z,
+        controller.profile.investigateSpeed,
+        -1,
+        0.0,
+        0.0
+    )
 end
 
 local function updateController(controller)
@@ -130,7 +215,34 @@ local function updateController(controller)
         local targetPlayer, targetPed, distance = findNearestVisiblePlayer(ped, controller.profile.detectionRange)
         if targetPed then
             beginCombat(controller, ped, targetPlayer, targetPed, distance)
+            return true
         end
+
+        local heardPlayer, heardPed, _, stimulus = findNearestAudiblePlayer(ped, controller.profile)
+        if heardPed then
+            beginInvestigate(controller, ped, heardPlayer, heardPed, stimulus)
+        end
+        return true
+    end
+
+    if controller.state == 'INVESTIGATE' then
+        local targetPlayer, targetPed, distance = findNearestVisiblePlayer(ped, controller.profile.detectionRange)
+        if targetPed then
+            beginCombat(controller, ped, targetPlayer, targetPed, distance)
+            return true
+        end
+
+        local heardPlayer, heardPed, _, stimulus = findNearestAudiblePlayer(ped, controller.profile)
+        if heardPed then
+            refreshInvestigation(controller, ped, heardPed, stimulus)
+            notifyState(controller, 'INVESTIGATE', heardPlayer)
+            return true
+        end
+
+        if GetGameTimer() - controller.lastStimulusAt >= controller.profile.investigateDuration then
+            beginSearch(controller, ped)
+        end
+
         return true
     end
 
@@ -174,6 +286,12 @@ local function updateController(controller)
             return true
         end
 
+        local heardPlayer, heardPed, _, stimulus = findNearestAudiblePlayer(ped, controller.profile)
+        if heardPed then
+            beginInvestigate(controller, ped, heardPlayer, heardPed, stimulus)
+            return true
+        end
+
         if GetGameTimer() - controller.stateSince >= controller.profile.searchDuration then
             requestControl(ped)
             ClearPedTasks(ped)
@@ -200,6 +318,8 @@ exports('RegisterPed', function(netId, profile, instanceId)
         state = 'IDLE',
         stateSince = GetGameTimer(),
         lastSeenAt = 0,
+        lastStimulusAt = 0,
+        lastStimulus = nil,
         deathReported = false
     }
 
