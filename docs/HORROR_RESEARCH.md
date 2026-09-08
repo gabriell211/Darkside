@@ -1,6 +1,6 @@
 # Pesquisa de referências de horror (FiveM -> DarkSide/RedM)
 
-Este documento registra recursos de FiveM pesquisados como referência de gameplay. Não copiamos automaticamente arquivos GTA V para RedM: formatos de peds/maps/natives podem ser incompatíveis e vários downloads possuem licenças ou propriedade intelectual que impedem redistribuição.
+Este documento registra resources, mapas e peds de FiveM pesquisados como referência de gameplay. Não copiamos automaticamente arquivos GTA V para RedM: formatos de peds/maps/natives podem ser incompatíveis e vários downloads possuem licenças ou propriedade intelectual que impedem redistribuição.
 
 ## O que foi aproveitado agora
 
@@ -80,7 +80,7 @@ Fonte: https://forum.cfx.re/t/the-apocalypse-project-v1-0-3-updated-07-09-2026/1
 
 Ideias úteis:
 - dividir conteúdo por região;
-- recursos separados por função;
+- resources separados por função;
 - controle de quantidade de entidades;
 - otimização progressiva por zona.
 
@@ -103,17 +103,62 @@ Esses conceitos entram no roadmap de `ds_ai`, `ds_entities` e `ds_director`.
 
 ## Assets/peds de horror encontrados
 
-Existem peds FiveM de personagens conhecidos e criaturas, inclusive modelos baseados em franquias como Dead by Daylight/Silent Hill. Eles não serão adicionados ao repositório automaticamente porque:
+### Unknown Creature
+Fonte: https://www.gta5-mods.com/player/unknown-creature-1-add-on-ped-replace-fivem
 
-1. um ped GTA V não é drop-in para RedM;
-2. muitos autores proíbem reupload;
-3. vários modelos pertencem a franquias de terceiros;
-4. um servidor público/comercial precisaria revisar licença e direitos de cada asset.
+É um ped genérico de criatura, com quatro variações de pele e LODs. O próprio autor informa que é FiveM-ready, mas também diz que qualquer edição do modelo exige autorização dele. Portanto **não vamos baixar, converter ou redistribuir no DarkSide sem permissão expressa**. Pode ser um candidato visual caso o autor autorize conversão para RedM.
 
-Para DarkSide, a prioridade é usar:
+### Jester custom ped
+Fonte: https://www.gta5-mods.com/player/jester-custom-ped
+
+Ped custom FiveM que pode servir como referência para um killer original de aparência teatral/macabra. Antes de usar qualquer arquivo, precisamos verificar licença/termos e compatibilidade de conversão para o esqueleto/formato RedM.
+
+### Halloween Pack
+Fonte: https://www.gta5-mods.com/player/halloween-pack
+
+Pacote antigo com peds e armas de horror. Há material vindo de XNALARA, então não é uma boa base para redistribuição automática. Serve apenas como referência de categorias de killer/props.
+
+### The Executioner / personagens de franquias
+Existem peds FiveM baseados em personagens conhecidos de Silent Hill, Dead by Daylight, Call of Duty e outras franquias. Não serão colocados no repositório DarkSide porque podem envolver direitos de terceiros, mesmo quando o conversor permite uso em FiveM.
+
+## Mapas de horror encontrados
+
+### Patoche Creepy House
+Fonte: https://www.gta5-mods.com/maps/mlo-patoche-creepy-house-fivem-altv-sp
+
+MLO de casa isolada feito para FiveM/GTAV. Não é drop-in no RedM. Referência útil para composição de um local de horror: interior pequeno, iluminação controlada, isolamento e reutilização fora de Halloween.
+
+### Lonehaven Legacy
+Fonte: https://www.gta5-mods.com/maps/lonehaven
+
+Cidade isolada/assombrada com foco em exploração, easter eggs e storytelling. O mapa é GTA V, mas o conceito combina muito com o DarkSide: uma região própria que parece ter história e eventos acontecendo sem depender de missão linear.
+
+### Backrooms Project
+Fonte: https://www.gta5-mods.com/maps/mlo-backrooms-project-sp-fivem
+
+Não é adequado para importar diretamente, mas é uma boa referência para **dimensões/áreas anômalas**: lugares que não precisam respeitar a geografia normal do mapa e podem ser acessados por evento, ritual, portal ou relíquia.
+
+## Áudio encontrado
+
+Há mods de substituição de gritos/dor para GTA V, mas muitos são feitos como `.awc`/OpenIV, não funcionam corretamente no FiveM e ainda reutilizam áudio de outros jogos. Não serão copiados. Para DarkSide vamos usar `ds_audio` com arquivos próprios/licenciados em `.ogg` e áudio 3D/NUI.
+
+## Regra para importar qualquer coisa externa
+
+Antes de um asset externo entrar em `resources/[assets]` ou semelhante, ele precisa passar pelos quatro checks:
+
+1. **Licença permite uso/redistribuição?**
+2. **Autor permite edição/conversão?**
+3. **Não depende de propriedade intelectual de outra franquia sem autorização?**
+4. **Existe caminho técnico real de GTA V/FiveM para RedM sem quebrar rig/animação/textura?**
+
+Se qualquer resposta for "não" ou estiver indefinida, o asset fica somente como referência.
+
+## Para DarkSide, a prioridade de assets é
+
 - peds/props nativos do RDR2 no protótipo;
 - assets originais ou licenciados depois;
-- partículas e alterações visuais para entidades que não precisam de um modelo completo.
+- partículas e alterações visuais para entidades que não precisam de um modelo completo;
+- contratação/conversão autorizada apenas quando o gameplay já estiver validado.
 
 ## Próximas extrações úteis da pesquisa
 
