@@ -153,6 +153,7 @@ RegisterNetEvent('ds_killers:server:aiStateChanged', function(instanceId, state,
 
     local allowedStates = {
         IDLE = true,
+        INVESTIGATE = true,
         CHASE = true,
         ATTACK = true,
         SEARCH = true
@@ -281,7 +282,6 @@ AddEventHandler('playerDropped', function()
     end
 
     for _, instanceId in ipairs(toRemove) do
-        local instance = instances[instanceId]
         MySQL.update.await([[
             UPDATE ds_killer_instances
             SET state = 'ORPHANED', despawn_reason = 'owner_disconnected', despawned_at = CURRENT_TIMESTAMP, updated_at = CURRENT_TIMESTAMP
