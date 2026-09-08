@@ -7,10 +7,12 @@ Set-StrictMode -Version Latest
 
 $Root = (Resolve-Path (Join-Path $PSScriptRoot '..')).Path
 $StandaloneDir = Join-Path $Root 'resources\[standalone]'
+$VoiceDir = Join-Path $Root 'resources\[voice]'
 $RsgDir = Join-Path $Root 'resources\[rsg]'
 $TempRoot = Join-Path ([System.IO.Path]::GetTempPath()) ('darkside-deps-' + [guid]::NewGuid().ToString('N'))
 
 New-Item -ItemType Directory -Force -Path $StandaloneDir | Out-Null
+New-Item -ItemType Directory -Force -Path $VoiceDir | Out-Null
 New-Item -ItemType Directory -Force -Path $RsgDir | Out-Null
 New-Item -ItemType Directory -Force -Path $TempRoot | Out-Null
 
@@ -73,7 +75,8 @@ function Install-GitDependency {
         [Parameter(Mandatory = $true)][string]$Name,
         [Parameter(Mandatory = $true)][string]$Repository,
         [Parameter(Mandatory = $true)][string]$Target,
-        [string]$Branch = 'main'
+        [string]$Branch = 'main',
+        [string]$Commit = ''
     )
 
     if (-not (Prepare-Target -Path $Target)) { return }
@@ -83,6 +86,14 @@ function Install-GitDependency {
 
     if ($LASTEXITCODE -ne 0) {
         throw "Falha ao clonar $Name."
+    }
+
+    if ($Commit) {
+        Write-Host "[PIN] $Name -> $Commit" -ForegroundColor DarkCyan
+        git -C $Target checkout --detach $Commit
+        if ($LASTEXITCODE -ne 0) {
+            throw "Falha ao fixar $Name no commit $Commit."
+        }
     }
 
     # As dependencias ficam vendorizadas no repositorio DarkSide, sem repositorios Git aninhados.
@@ -105,6 +116,13 @@ try {
     Install-ReleaseZip -Name 'oxmysql' `
         -Url 'https://github.com/overextended/oxmysql/releases/download/v2.14.1/oxmysql.zip' `
         -Target (Join-Path $StandaloneDir 'oxmysql')
+
+    # Voz. A BaseReborn inclui uma copia antiga do pma-voice com manifest gta5.
+    # Para DarkSide usamos o upstream atual, da mesma familia PMA, pois este possui suporte explicito a RedM.
+    Install-GitDependency -Name 'pma-voice' `
+        -Repository 'https://github.com/AvarianKnight/pma-voice.git' `
+        -Target (Join-Path $VoiceDir 'pma-voice') `
+        -Commit '6c9d96ed7a02e30912f1a0ce92629bf9afbbca8c'
 
     # Base RedM/RSG.
     Install-GitDependency -Name 'rsg-core' `
