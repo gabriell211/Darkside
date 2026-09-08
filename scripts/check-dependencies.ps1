@@ -14,6 +14,7 @@ $Required = @(
     @{ Name = 'ds_core'; Path = 'resources\[darkside]\ds_core\fxmanifest.lua' },
     @{ Name = 'ds_clans'; Path = 'resources\[darkside]\ds_clans\fxmanifest.lua' },
     @{ Name = 'ds_powers'; Path = 'resources\[darkside]\ds_powers\fxmanifest.lua' },
+    @{ Name = 'ds_voice'; Path = 'resources\[darkside]\ds_voice\fxmanifest.lua' },
     @{ Name = 'ds_ai'; Path = 'resources\[darkside]\ds_ai\fxmanifest.lua' },
     @{ Name = 'ds_killers'; Path = 'resources\[darkside]\ds_killers\fxmanifest.lua' },
     @{ Name = 'ds_horror'; Path = 'resources\[darkside]\ds_horror\fxmanifest.lua' }
