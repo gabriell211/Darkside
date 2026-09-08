@@ -12,9 +12,26 @@ set onesync on
 # Banco
 set mysql_connection_string "mysql://USER:PASSWORD@127.0.0.1/darkside?charset=utf8mb4"
 
+# Voz (pma-voice / Mumble interno do Cfx)
+# Native audio permite espacialização/reverb/submix no RedM.
+setr voice_useNativeAudio true
+setr voice_useSendingRangeOnly true
+setr voice_enableUi 1
+setr voice_enableProximityCycle 1
+setr voice_defaultVoiceMode 2
+setr voice_enableSubmix 1
+
+# DarkSide ainda não usa telefone/rádio. Mantemos os módulos desligados por enquanto.
+setr voice_enableRadios 0
+setr voice_enableCalls 0
+setr voice_enableRadioAnim 0
+
 # Dependências standalone
 ensure oxmysql
 ensure ox_lib
+
+# Voz
+ensure pma-voice
 
 # Base RSG mínima
 ensure rsg-core
@@ -26,6 +43,7 @@ ensure rsg-appearance
 ensure ds_core
 ensure ds_clans
 ensure ds_powers
+ensure ds_voice
 ensure ds_ai
 ensure ds_killers
 ensure ds_horror
