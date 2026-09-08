@@ -133,16 +133,13 @@ local function effectVisionDistortion(intensity)
 end
 
 local function effectPresence(intensity)
-    -- Clean-room placeholder for future apparition/entity logic.
-    -- It deliberately avoids spawning copyrighted FiveM peds into RedM.
-    local ped = PlayerPedId()
-    local originalAlpha = GetEntityAlpha(ped)
-
+    -- Placeholder para futura aparição/entidade. Usa apenas natives já comuns em RedM
+    -- e não depende de ped GTA/FiveM ou asset de terceiros.
     PlaySoundFrontend('BACK', 'RDRO_Character_Creator_Sounds', true, 0)
     ShakeGameplayCam('DRUNK_SHAKE', 0.12 + (intensity * 0.2))
-    SetEntityAlpha(ped, 185, false)
-    Wait(350)
-    SetEntityAlpha(ped, originalAlpha, false)
+    DoScreenFadeOut(120)
+    Wait(150)
+    DoScreenFadeIn(220)
 end
 
 local effectHandlers = {
@@ -268,5 +265,4 @@ end)
 AddEventHandler('onResourceStop', function(resourceName)
     if resourceName ~= GetCurrentResourceName() then return end
     stopTransientEffects()
-    if PlayerPedId() then SetEntityAlpha(PlayerPedId(), 255, false) end
 end)
