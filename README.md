@@ -69,6 +69,7 @@ RedM
         ├── ds_zones
         ├── ds_ai
         ├── ds_killers
+        ├── ds_horror
         ├── ds_entities
         ├── ds_director
         ├── ds_events
@@ -84,8 +85,9 @@ O RSG-Core é infraestrutura. As regras de gameplay pertencem aos resources `ds_
 - `ds_core`: integração base com RSG-Core e persistência DarkSide.
 - `ds_clans`: estrutura inicial de clãs jogáveis.
 - `ds_powers`: energia, cooldown e poderes iniciais.
-- `ds_ai`: controlador reutilizável de NPCs com `IDLE`, `CHASE`, `ATTACK` e `SEARCH`.
+- `ds_ai`: controlador reutilizável de NPCs com visão, audição e estados `IDLE`, `INVESTIGATE`, `CHASE`, `ATTACK` e `SEARCH`.
 - `ds_killers`: spawn networked, registry server-side, comandos administrativos e persistência de encontros.
+- `ds_horror`: zonas de horror, intensidade progressiva, efeitos nativos de atmosfera, modo de teste e telemetria SQL.
 
 O primeiro killer técnico é `hunter` / **The Hunter**. O modelo atual é temporário; serve para validar IA e networking.
 
@@ -97,17 +99,20 @@ Instalação nova:
 database/schema.sql
 ```
 
-Se você já importou o schema antes da implementação dos killers, rode também:
+Se você já importou schemas anteriores, execute as migrations em ordem:
 
 ```text
 database/migrations/002_killers.sql
+database/migrations/003_horror.sql
 ```
 
-As tabelas novas são:
+Tabelas DarkSide adicionadas nesta etapa:
 
 ```text
 ds_killer_instances
 ds_killer_encounters
+ds_horror_events
+ds_horror_zone_state
 ```
 
 ## Teste do killer
@@ -121,13 +126,33 @@ Com a ACE `darkside.admin` configurada:
 /dskiller clear
 ```
 
-Pelo console:
+O killer já pode investigar ruídos. Tiros possuem alcance de audição maior; movimento próximo também pode levá-lo ao estado `INVESTIGATE` mesmo sem linha de visão.
+
+## Teste do sistema de horror
+
+Na sua posição atual:
 
 ```text
-dskiller spawn hunter <playerId>
+/dshorror test
 ```
 
-Veja `docs/KILLERS.md` para funcionamento, segurança e limitações do protótipo.
+Ou escolha a duração em segundos:
+
+```text
+/dshorror test 300
+```
+
+Para encerrar:
+
+```text
+/dshorror stop
+```
+
+A zona temporária aumenta a intensidade com o tempo e dispara efeitos de câmera, som nativo e pós-processamento. Ela existe apenas para validar a infraestrutura; as zonas definitivas serão definidas depois da escolha das regiões do mapa.
+
+## Pesquisa FiveM -> RedM
+
+A pesquisa de resources de horror do ecossistema FiveM está registrada em `docs/HORROR_RESEARCH.md`. Recursos GTA V pagos, escrow, peds com propriedade intelectual ou downloads sem permissão de redistribuição não são copiados para este repositório. As ideias úteis são reimplementadas para RedM dentro da arquitetura DarkSide.
 
 ## Primeira meta: Vertical Slice
 
@@ -142,7 +167,7 @@ A primeira versão jogável deve provar o conceito inteiro com o menor escopo po
 7. Usar pelo menos um poder por clã.
 8. Explorar e coletar loot.
 9. Encontrar um killer NPC.
-10. Killer investigar, perseguir, atacar, perder alvo e procurar novamente.
+10. Killer ouvir/investigar, perseguir, atacar, perder alvo e procurar novamente.
 11. Morrer/reviver sem lógica de hospital humano.
 12. Persistir clã e progressão no banco.
 
@@ -159,6 +184,6 @@ A primeira versão jogável deve provar o conceito inteiro com o menor escopo po
 
 **Fase 0 — Fundação técnica / Vertical Slice.**
 
-A fundação, clãs, poderes e primeiro killer com IA já estão no repositório. Próximas prioridades: `ds_zones`, percepção por som, criaturas, entidades e Horror Director.
+A fundação, clãs, poderes, primeiro killer, percepção por som e primeira camada de horror já estão no repositório. Próximas prioridades: áudio 3D próprio, entidades/aparições, zonas permanentes, Horror Director e progressão.
 
-Consulte `docs/GDD.md`, `docs/ARCHITECTURE.md`, `docs/ROADMAP.md` e `docs/KILLERS.md`.
+Consulte `docs/GDD.md`, `docs/ARCHITECTURE.md`, `docs/ROADMAP.md`, `docs/KILLERS.md` e `docs/HORROR_RESEARCH.md`.
