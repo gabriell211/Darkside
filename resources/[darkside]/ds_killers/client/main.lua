@@ -8,6 +8,10 @@ local function notify(description, notificationType)
     })
 end
 
+RegisterNetEvent('ds_killers:client:message', function(message, notificationType)
+    notify(message, notificationType)
+end)
+
 local function spawnKiller(instanceId, killerId)
     local definition = DarkSideKillers[killerId]
     if not definition then
