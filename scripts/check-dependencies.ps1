@@ -6,13 +6,17 @@ $Root = (Resolve-Path (Join-Path $PSScriptRoot '..')).Path
 $Required = @(
     @{ Name = 'ox_lib'; Path = 'resources\[standalone]\ox_lib\fxmanifest.lua' },
     @{ Name = 'oxmysql'; Path = 'resources\[standalone]\oxmysql\fxmanifest.lua' },
+    @{ Name = 'pma-voice'; Path = 'resources\[voice]\pma-voice\fxmanifest.lua' },
     @{ Name = 'rsg-core'; Path = 'resources\[rsg]\rsg-core\fxmanifest.lua' },
     @{ Name = 'rsg-menubase'; Path = 'resources\[rsg]\rsg-menubase\fxmanifest.lua' },
     @{ Name = 'rsg-inventory'; Path = 'resources\[rsg]\rsg-inventory\fxmanifest.lua' },
     @{ Name = 'rsg-appearance'; Path = 'resources\[rsg]\rsg-appearance\fxmanifest.lua' },
     @{ Name = 'ds_core'; Path = 'resources\[darkside]\ds_core\fxmanifest.lua' },
     @{ Name = 'ds_clans'; Path = 'resources\[darkside]\ds_clans\fxmanifest.lua' },
-    @{ Name = 'ds_powers'; Path = 'resources\[darkside]\ds_powers\fxmanifest.lua' }
+    @{ Name = 'ds_powers'; Path = 'resources\[darkside]\ds_powers\fxmanifest.lua' },
+    @{ Name = 'ds_ai'; Path = 'resources\[darkside]\ds_ai\fxmanifest.lua' },
+    @{ Name = 'ds_killers'; Path = 'resources\[darkside]\ds_killers\fxmanifest.lua' },
+    @{ Name = 'ds_horror'; Path = 'resources\[darkside]\ds_horror\fxmanifest.lua' }
 )
 
 $Failed = $false
